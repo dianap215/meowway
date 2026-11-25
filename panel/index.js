@@ -39,16 +39,18 @@ function notice(message, bad = false) {
 }
 
 function percent(value) {
-  return Number.isFinite(value) ? value.toFixed(1) + '%' : '?';
+  return Number.isFinite(value) ? value.toFixed(1) + '%' : '\u2014';
 }
 
 function renderMetrics(status) {
   const {usage, resources, settings} = status;
-  $('connected-users').textContent = usage?.available && Number.isFinite(usage.users)
-    ? usage.users.toLocaleString() : '?';
-  $('users-detail').textContent = usage?.available && usage.users === null
-    ? usage.connections.toLocaleString() + ' active connections; client count unavailable'
-    : 'Estimated from active IPs';
+  const showConnections = usage?.available && !Number.isFinite(usage.users);
+  const count = showConnections ? usage.connections : usage?.users;
+  $('activity-label').textContent = showConnections ? 'Active connections' : 'Active users';
+  $('connected-users').textContent = usage?.available && Number.isFinite(count)
+    ? count.toLocaleString() : '\u2014';
+  $('users-detail').textContent = showConnections ? 'Unique user count unavailable'
+    : usage?.available ? 'Estimated from active IPs' : 'Live activity unavailable';
   $('cpu-value').textContent = percent(resources?.cpu_percent);
   $('memory-value').textContent = percent(resources?.memory_percent);
   $('memory-detail').textContent = Number.isFinite(resources?.memory_used)
@@ -56,7 +58,7 @@ function renderMetrics(status) {
   $('sponsor-badge').textContent = settings.enabled
     ? (settings.channel ? '@' + settings.channel : 'Enabled') : 'Disabled';
   $('total-usage').textContent = Number.isFinite(usage?.total_bytes)
-    ? (usage.total_bytes / 1e9).toLocaleString(undefined, {maximumFractionDigits: 3}) + ' GB' : '?';
+    ? (usage.total_bytes / 1e9).toLocaleString(undefined, {maximumFractionDigits: 3}) + ' GB' : '\u2014';
   $('usage-period').textContent = usage
     ? 'Since ' + new Date(usage.since * 1000).toLocaleDateString() : '';
 }
