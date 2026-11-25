@@ -1,0 +1,7 @@
+.git
+.cache
+.data
+data
+.env
+.dev.vars
+**/__pycache__

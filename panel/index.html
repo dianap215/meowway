@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meow</title>
+  <link rel="stylesheet" href="/panel/style.css">
+  <script src="/panel/index.js" defer></script>
+</head>
+<body>
+  <main>
+    <section id="login-view" class="card auth">
+      <h1>Meow</h1>
+      <form id="login-form">
+        <label for="password">Owner password</label>
+        <input id="password" type="password" autocomplete="current-password" required maxlength="256">
+        <button type="submit">Sign in</button>
+        <p id="login-error" class="error" role="alert"></p>
+      </form>
+    </section>
+    <section id="setup-view" class="card auth" hidden>
+      <h1>Set up the owner panel</h1>
+      <form id="setup-form">
+        <label for="setup-code">One-time code from deployment logs</label>
+        <input id="setup-code" type="password" autocomplete="off" required maxlength="128">
+        <label for="setup-password">New password</label>
+        <input id="setup-password" type="password" autocomplete="new-password" minlength="8" maxlength="256" required>
+        <label for="setup-confirm">Confirm password</label>
+        <input id="setup-confirm" type="password" autocomplete="new-password" minlength="8" maxlength="256" required>
+        <button type="submit">Create password</button>
+        <p id="setup-error" class="error" role="alert"></p>
+      </form>
+    </section>
+    <section id="dashboard" hidden>
+      <header>
+        <div><h1>Meow</h1><p id="running"></p></div>
+        <button id="logout" type="button">Sign out</button>
+      </header>
+      <dl class="metrics">
+        <div class="card"><dt>Active users</dt><dd id="connected-users">&mdash;</dd><small id="users-detail">Estimated from active IPs</small></div>
+        <div class="card"><dt>CPU usage</dt><dd id="cpu-value">&mdash;</dd></div>
+        <div class="card"><dt>Memory usage</dt><dd id="memory-value">&mdash;</dd><small id="memory-detail"></small></div>
+        <div class="card"><dt>Sponsored channel</dt><dd id="sponsor-badge">&mdash;</dd></div>
+        <div class="card"><dt>Total traffic</dt><dd id="total-usage">&mdash;</dd><small id="usage-period"></small></div>
+      </dl>
+      <div class="refresh-row"><small id="last-updated"></small><button id="refresh" type="button">Refresh</button></div>
+      <p id="storage-note" hidden>Attach persistent storage to keep settings and traffic totals across redeploys.</p>
+      <p id="notice" role="status" hidden></p>
+      <details class="card">
+        <summary>Sponsorship settings</summary>
+        <form id="sponsor-form">
+          <label for="channel">Public channel username</label>
+          <input id="channel" autocomplete="off" placeholder="@your_channel" maxlength="64">
+          <label for="ad-tag">Promotion tag from <a href="https://t.me/MTProxybot">@MTProxybot</a></label>
+          <input id="ad-tag" autocomplete="off" spellcheck="false" maxlength="32">
+          <label class="check"><input id="enabled" type="checkbox"> Enable sponsorship</label>
+          <div class="actions"><button id="save" type="submit">Save changes</button><button id="copy-key" type="button">Copy registration key</button></div>
+        </form>
+      </details>
+      <details class="card">
+        <summary>Connection links</summary>
+        <p id="network-note"></p>
+        <p>Endpoint <code id="endpoint"></code></p>
+        <p>TLS domain <code id="tls-host"></code></p>
+        <label for="web-link">Telegram HTTPS link</label>
+        <div class="link-row"><input id="web-link" readonly><button id="copy-link" type="button">Copy</button></div>
+        <label for="tg-link">Direct Telegram link</label>
+        <div class="link-row"><input id="tg-link" readonly><button id="copy-tg-link" type="button">Copy</button></div>
+        <a id="open-telegram" hidden>Open in Telegram</a>
+      </details>
+      <details class="card">
+        <summary>Cloudflare bridge <small id="bridge-badge"></small></summary>
+        <form id="bridge-form">
+          <p>Worker name <code id="worker-name"></code></p>
+          <label for="railway-origin">Hosting origin</label>
+          <input id="railway-origin" readonly>
+          <label for="worker-url">Cloudflare Worker URL</label>
+          <input id="worker-url" type="url">
+          <label for="public-ip">Worker IPv4 override (optional)</label>
+          <input id="public-ip" placeholder="Resolve automatically">
+          <label class="check"><input id="bridge-enabled" type="checkbox"> Enable Meow WEB</label>
+          <button id="save-bridge" type="submit">Save bridge settings</button>
+        </form>
+        <div class="actions">
+          <button id="copy-worker-code" type="button">Copy Worker code</button>
+          <a href="/api/bridge/standalone" download="blue-knight-worker.mjs">Download Worker</a>
+          <a href="/api/bridge/bundle" download="blue-knight-bridge.zip">Download Wrangler bundle</a>
+        </div>
+        <details id="worker-source-box">
+          <summary>Worker source and private token</summary>
+          <label for="worker-source">Worker source</label>
+          <textarea id="worker-source" readonly rows="6" spellcheck="false"></textarea>
+          <button id="load-worker-code" type="button">Load code</button>
+          <label for="bridge-token">Private bridge token</label>
+          <div class="link-row"><input id="bridge-token" readonly><button id="copy-bridge-token" type="button">Copy token</button></div>
+        </details>
+        <label for="bridge-link">Telegram WEB link</label>
+        <div class="link-row"><input id="bridge-link" readonly><button id="copy-bridge-link" type="button">Copy</button></div>
+        <a id="open-web-telegram" hidden>Open Meow WEB in Telegram</a>
+      </details>
+    </section>
+  </main>
+</body>
+</html>
