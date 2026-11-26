@@ -185,6 +185,24 @@ class ResourceTests(unittest.TestCase):
 
 
 class UsageTests(unittest.TestCase):
+    def test_web_count_deduplicates_live_client_addresses(self):
+        sessions = [
+            {"state": "committed", "client_ip": "1.1.1.1"},
+            {"state": "healthy", "client_ip": "1.1.1.1"},
+            {"state": "healthy", "client_ip": "2606:4700::1111"},
+            {"state": "provisional", "client_ip": "8.8.8.8"},
+            {"state": "healthy", "client_ip": "127.0.0.1"},
+        ]
+        page = {"sessions": sessions, "next_cursor": None, "partial": [],
+                "partial_sessions": 0, "scan_truncated": False}
+        with patch.object(panel.http.client, "HTTPConnection") as factory:
+            response = factory.return_value.getresponse.return_value
+            response.status = 200
+            response.read.side_effect = lambda _: json.dumps({"data": page}).encode()
+            self.assertEqual(panel.count_web_clients(), 2)
+            page["partial_sessions"] = 1
+            self.assertIsNone(panel.count_web_clients())
+
     def test_telemt_counts_are_not_confused_with_connections_or_decoys(self):
         text = """# HELP telemt_user_connections_current Per-user active connections
 telemt_user_connections_current{user="owner"} 9

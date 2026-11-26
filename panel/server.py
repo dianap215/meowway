@@ -99,6 +99,31 @@ def parse_usage_metrics(text):
             "upload": total("telemt_user_octets_from_client_total"), "download": total("telemt_user_octets_to_client_total"),
             "valid": "# HELP telemt_user_connections_current " in text}
 
+def count_web_clients():
+    """Count distinct public addresses in authenticated, live WEB sessions."""
+    connection = http.client.HTTPConnection("127.0.0.1", int(os.environ.get("TELEMT_API_PORT", "9091")), timeout=1)
+    try:
+        connection.request("GET", "/v1/runtime/web/sessions?limit=200")
+        response = connection.getresponse()
+        raw = response.read(1024 * 1024 + 1)
+        if response.status != 200 or len(raw) > 1024 * 1024:
+            return None
+        page = json.loads(raw)["data"]
+        if page["next_cursor"] or page["partial"] or page["partial_sessions"] or page["scan_truncated"]:
+            return None
+        addresses = set()
+        for session in page["sessions"]:
+            if session["state"] in ("committed", "healthy"):
+                address = ipaddress.ip_address(session["client_ip"])
+                if address.is_global and not address.is_multicast:
+                    addresses.add(address)
+        return len(addresses)
+    except (OSError, ValueError, KeyError, TypeError, http.client.HTTPException):
+        return None
+    finally:
+        connection.close()
+
+
 def validate_bridge(data):
     if not isinstance(data, dict):
         raise ValueError("Invalid bridge settings")
@@ -412,6 +437,8 @@ class Proxy:
                     self.usage[key] += current[index] - previous if current[index] >= previous else current[index]
                 self.usage_last = current
                 self.live_usage = {"available": True, "users": metric["users"], "connections": metric["connections"]}
+                if self.network.railway and self.bridge["enabled"]:
+                    self.live_usage["web_users"] = count_web_clients()
             except (OSError, ValueError, http.client.HTTPException):
                 self.live_usage = {"available": False, "users": None, "connections": None}
             finally:

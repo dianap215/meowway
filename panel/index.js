@@ -49,7 +49,9 @@ function renderMetrics(status) {
   $('activity-label').textContent = showConnections ? 'Active connections' : 'Active users';
   $('connected-users').textContent = usage?.available && Number.isFinite(count)
     ? count.toLocaleString() : '\u2014';
-  $('users-detail').textContent = showConnections ? 'Unique user count unavailable'
+  const webUsers = usage?.web_users;
+  $('users-detail').textContent = showConnections
+    ? (Number.isFinite(webUsers) ? webUsers.toLocaleString() + ' active WEB IPs' : 'Unique user count unavailable')
     : usage?.available ? 'Estimated from active IPs' : 'Live activity unavailable';
   $('cpu-value').textContent = percent(resources?.cpu_percent);
   $('memory-value').textContent = percent(resources?.memory_percent);

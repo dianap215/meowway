@@ -13,6 +13,6 @@ A Telegram MTProto proxy with a private dashboard, sponsored-channel settings, l
 4. Add a **TCP Proxy** targeting port `3128`. Railway assigns the public hostname and port used in the Telegram links. Redeploy after adding networking or the volume so Railway injects the service variables.
 5. Once `/health` is healthy, open `/panel/` on the HTTPS domain. Use the one-time code in the deployment logs to create the owner password. Find the Telegram link under **Connection links**.
 
-The panel shows total Telegram upload and download traffic in decimal GB. Railway's TCP ingress hides the original client IPs, so the Active users card shows the live connection count when a unique-user estimate is unavailable. CPU and memory come from container metrics.
+The panel shows total Telegram upload and download traffic in decimal GB. Railway's TCP ingress hides direct clients' original IPs. The panel shows active connections and, when the Cloudflare bridge is enabled and its session metrics are available, the number of distinct IPs with active WEB sessions. CPU and memory come from container metrics.
 
 See [Railway TCP Proxy](https://docs.railway.com/networking/tcp-proxy) and [Railway volume setup](https://docs.railway.com/volumes).
